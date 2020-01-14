@@ -2,26 +2,27 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using CommandLine;
+using floss.GitHub;
+using floss.Npms;
 
 namespace floss
 {
     class Program
     {
-        public static void Main(string[] args)
+        /// <param name="target" >Set the target package.json location</param>
+        public static async Task Main(string target)
         {
-            Parser.Default.ParseArguments<Arguments>(args)
-                  .WithParsed<Arguments>(async opts =>
-                  {
-                      HttpClient client = new HttpClient();
-                      IEnumerable<string> dependencyList = PackageJson.Parse(opts.Target);
-                      IEnumerable<string> packages = await NpmService.GetPackageInfo(client, dependencyList);
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "floss");
 
-                      foreach (string package in packages)
-                      {
-                          Console.WriteLine(package);
-                      }
-                  });
+            IEnumerable<string> dependencyList = PackageJson.Parser.Parse(target);
+            IEnumerable<string> packages = await NpmsService.GetPackageInfo(client, dependencyList);
+            IEnumerable<string> repositories = await GitHubService.GetRepositoryInfo(client, packages);
+
+            foreach (string beb in repositories)
+            {
+                Console.WriteLine(beb);
+            }
         }
     }
 }

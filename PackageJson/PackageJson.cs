@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace floss
+namespace floss.PackageJson
 {
     public class PackageJsonObject
     {
@@ -13,7 +13,7 @@ namespace floss
         public Dictionary<string, string> Dependencies { get; set; }
     }
 
-    public static class PackageJson
+    public static class Parser
     {
         public static IEnumerable<string> Parse(string fileLocation)
         {

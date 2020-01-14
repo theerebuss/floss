@@ -5,18 +5,24 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System;
 
-namespace floss
+namespace floss.Npms
 {
-    public static class NpmService
+    public static class NpmsService
     {
         public static async Task<string> GetPackageInfo(HttpClient client, string packageName)
         {
-            Console.WriteLine(packageName);
             try
             {
-                var stream = await client.GetStreamAsync($"https://api.npms.io/v2/package/{packageName}");
-                var content = await JsonSerializer.DeserializeAsync<string>(stream);
-                return content;
+                var response = await client.GetAsync($"https://api.npms.io/v2/package/{packageName}");
+                response.EnsureSuccessStatusCode();
+
+                var content = await response.Content.ReadAsStringAsync();
+
+                return JsonSerializer.Deserialize<NpmsObject>(content)
+                    .Collected
+                    .Metadata
+                    .Links
+                    .Repository;
             }
             catch (Exception e)
             {
